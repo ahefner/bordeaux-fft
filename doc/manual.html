@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title>Bordeaux-FFT User Manual</title>
+  <style type="text/css" title="currentStyle" media="screen">
+    @import "style.css";
+  </style>
+</head>
+
+<body>
+
+<h1>Bordeaux-FFT User Manual</h1>
+
+<!-- Contents -->
+
+<h2>Table of Contents</h2>
+
+<ol>
+  <li><a href="#Introduction">Introduction</a></li>
+  <li><a href="#Installation">Installation</a></li>
+  <li><a href="#Funcs">FFT/IFFT Functions</a></li>
+  <li><a href="#Windows">Signal Window Functions</a></li>
+  <li><a href="#Muliprocessing">Multiprocessing Notes</a></li>
+  <li><a href="#Changelog">Revision History</a></li>
+  <li><a href="#Contact">Contact</a></li>
+</ol>
+
+
+<!-- Body Text -->
+
+<!--  ----------------------------------------------------------------- -->
+<h2><a name="Introduction"></a>Introduction</h2>
+
+<p>The Bordeaux-FFT library provides a reasonably efficient implementation of the Fast Fourier Transform and its inverse for complex-valued inputs, in portable Common Lisp. This is the manual for version 2 of the library.</p>
+
+<p>It was originally written by Robert Strandh, Sylvain Marchand, Martin Raspaud. Andy Hefner added the signal windowing code, other minor improvements, and wrote the manual. Paul Khuong contributed performance enhancements.</p>
+
+<p>Functions and types documented in this manual are exported from the <tt>BORDEAUX-FFT</tt> package.</p>
+
+<!--  ----------------------------------------------------------------- -->
+<h2><a name="Installation"></a>Installation</h2>
+
+<p>Bordeaux-FFT can be loaded either by compiling and loading the <tt>fft.lisp</tt> file directly, or using ASDF. An ASDF system definition file is included. Under typical ASDF configurations, a symbolic link to the file <tt>bordeaux-fft.asd</tt> should be created in a path included in your <tt>ASDF:*CENTRAL-REGISTRY*</tt>. For SBCL users, <tt>~/.sbcl/systems/</tt> is a common choice. You will then be able to load the <tt>BORDEAUX-FFT</tt> system using ASDF as follows: <tt> (asdf:oos 'asdf:load-op :bordeaux-fft)</tt>
+</p>
+
+<p>The most current version of Bordeaux-FFT may be obtained from <a href="http://vintage-digital.com/hefner/software/bordeaux-fft/bordeaux-fft-current.tar.gz">http://vintage-digital.com/hefner/software/bordeaux-fft/bordeaux-fft-current.tar.gz</a>.
+
+<!--  ----------------------------------------------------------------- -->
+<h2><a name="Funcs"></a>FFT / IFFT Functions</h2>
+
+<p>The FFT and IFFT functions each come in three variations: a simple version which handles converting its input to the required format, and two more efficient versions which assume the input is a <a href="#complex-sample-array"><tt>complex-sample-array</tt></a>. Versions are available which allocate a new output vector, or write into an existing output vector. In all cases, the input vector must have a size which is a power of two.</p>
+
+<div class="def"><a name="complex-sample">Type</a>
+                       <b>complex-sample</b> 
+ <div class="docbody">
+ <pre>(deftype complex-sample () `(complex double-float))</pre>
+ </div>
+</div>
+
+<div class="def"><a name="complex-sample-array">Type</a>
+                       <b>complex-sample-array</b> 
+ <div class="docbody">
+ <pre>(deftype complex-sample-array ()  `(simple-array complex-sample (*)))</pre>
+ </div>
+</div>
+
+<div class="def"><a name="fft">Function</a>
+                       <b>fft</b> 
+ <i>source</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the Fourier transform of <i>source</i> (a <a href="#complex-sample-array"><tt>complex-sample-array</tt></a> of a power of two in size), allocating a new array for the <i>result</i> (a <a href="#complex-sample-array"><tt>complex-sample-array</tt></a> of the same size as the <i>source</i>).
+ </div>
+</div>
+
+<div class="def"><a name="fft!">Function</a>
+                       <b>fft!</b> 
+ <i>source dest</i> &rArr; <i>dest</i>
+ <div class="docbody">
+   <p>Desctructive version of <a href="#fft"><tt>fft</tt></a>. Computes the Fourier transform of <i>source</i>, writing the result into <i>dest</i>. The <i>source</i> and <i>dest</i> vectors must both be of type <a href="#complex-sample-array"><tt>complex-sample-array</tt></a> and have a size which is a power of two. Additionally, <i>dest</i> cannot be smaller than <i>source</i>.
+ </div>
+</div>
+
+<div class="def"><a name="sfft">Function</a>
+                       <b>sfft</b> 
+ <i>source <tt>&amp;optional</tt> len</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Simple version of <a href="#fft"><tt>fft</tt></a>. It can take any kind of array as input. If <i>len</i> is supplied, only the first <i>len</i> elements of <i>source</i> are used.</p>
+ </div>
+</div>
+
+<div class="def"><a name="ifft">Function</a>
+                       <b>ifft</b> 
+ <i>source</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the inverse Fourier transform of <i>source</i> (a <a href="#complex-sample-array"><tt>complex-sample-array</tt></a> of a power of two in size), allocating a new array for the <i>result</i> (a <a href="#complex-sample-array"><tt>complex-sample-array</tt></a> of the same size as the <i>source</i>).
+ </div>
+</div>
+
+<div class="def"><a name="ifft!">Function</a>
+                       <b>ifft!</b> 
+ <i>source dest</i> &rArr; <i>dest</i>
+ <div class="docbody">
+   <p>Desctructive version of <a href="#ifft"><tt>ifft</tt></a>. Computes the inverse Fourier transform of <i>source</i>, writing the result into <i>dest</i>. The <i>source</i> and <i>dest</i> vectors must both be of type <a href="#complex-sample-array"><tt>complex-sample-array</tt></a> and have a size which is a power of two. Additionally, <i>dest</i> cannot be smaller than <i>source</i>.
+ </div>
+</div>
+
+<div class="def"><a name="sifft">Function</a>
+                       <b>sifft</b> 
+ <i>source <tt>&amp;optional</tt> len</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Simple version of <a href="#ifft"><tt>ifft</tt></a>. It can take any kind of array as input. If <i>len</i> is supplied, only the first <i>len</i> elements of <i>source</i> are used.</p>
+ </div>
+</div>
+
+<!--  ----------------------------------------------------------------- -->
+<h2><a name="Windows"></a>Signal Window Functions</h2>
+
+<div class="def"><a name="windowed-fft">Function</a>
+                       <b>windowed-fft</b>
+ <i>signal-vector center length <tt>&amp;optional</tt> (window-fn 'hann)</i> &rArr; <i>result</i>
+ <div class="docbody">
+ <p>Returns the FFT of a window of <i>length</i> samples from <i>signal-vector</i> (a <a href="#complex-sample-array"><tt>complex-sample-array</tt></a>), centered on the offset <i>center</i>. Areas where the window would extend outside the bounds of the array are taken to be zeros. Before being computing the FFT, the specified region of the signal is multiplied by the result of a window function, <i>window-fn</i>, which takes as arguments an array index (from 0 below <i>length</i>) and <i>length</i>, the window size, and must return a double float. Windows for a given <i>window-fn</i> and <i>length</i> are memoized, so the cost of computing the window is paid only once for any particular combination. Several built-in choices for <i>window-fn</i> are presented below. A new <i>result</i> vector is allocated; the original <i>signal-vector</i> is not modified.</p>
+
+<p>The following expressions produce equivalent results: <tt>(windowed-fft vector 256 512 'rectangular)</tt> and <tt>(fft vector)</tt>.
+ </div>
+</div>
+
+<div class="def"><a name="window-vector">Function</a>
+                       <b>window-vector</b> 
+ <i>function length</i> &rArr; <i>vector</i>
+ <div class="docbody">
+ <p>Compute and return a <i>vector</i> of <i>length</i> samples by evaluating <i>function</i> at 0, 1, 2, ..., <i>length</i>. The resulting <i>vector</i> for a given <i>function</i> and <i>length</i> is memoized so that it is computed only once, and subsequent requests will return the same <i>vector</i> again.</p>
+ </div>
+</div>
+
+<p>Several window functions are provided. These can be used as arguments to <a href="#windowed-fft"><tt>windowed-fft</tt></a> or <a href="#window-vector"><tt>window-vector</tt></a>.</p>
+
+<div class="def"><a name="rectangular">Function</a>
+                       <b>rectangular</b> 
+ <i>i n</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the <i>i</i>-th point of the <i>n</i>-point rectangular window.</p>
+ </div>
+</div>
+
+<div class="def"><a name="triangle">Function</a>
+                       <b>triangle</b> 
+ <i>i n</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the <i>i</i>-th point of the <i>n</i>-point triangular window.</p>
+ </div>
+</div>
+
+<div class="def"><a name="hann">Function</a>
+                       <b>hann</b> 
+ <i>i n</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the <i>i</i>-th point of the <i>n</i>-point Hann window.</p>
+ </div>
+</div>
+
+<div class="def"><a name="blackman">Function</a>
+                       <b>blackman</b> 
+ <i>i n</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the <i>i</i>-th point of the <i>n</i>-point Blackman window (with &alpha;=0.16).</p>
+ </div>
+</div>
+
+<div class="def"><a name="bartlett">Function</a>
+                       <b>bartlett</b> 
+ <i>i n</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the <i>i</i>-th point of the <i>n</i>-point Bartlett window.</p>
+ </div>
+</div>
+
+<div class="def"><a name="blackman-harris">Function</a>
+                       <b>blackman-harris</b> 
+ <i>i n</i> &rArr; <i>result</i>
+ <div class="docbody">
+   <p>Returns the <i>i</i>-th point of the <i>n</i>-point Blackman-Harris window.</p>
+ </div>
+</div>
+
+<div class="def"><a name="gaussian">Function</a>
+                       <b>gaussian</b> 
+ <i>sigma</i> &rArr; <i>window-function</i>
+ <div class="docbody">
+   <p>Returns a <i>window-function</i> for evaluating a Gaussian window, given the parameter <i>sigma.</i> The result is memoized.</p>
+ </div>
+</div>
+
+<div class="def"><a name="gaussian*bartlett^x">Function</a>
+                       <b>gaussian*bartlett^x</b> 
+ <i>sigma triangle-exponent</i> &rArr; <i>window-function</i>
+ <div class="docbody">
+   <p>Returns a <i>window-function</i> to evaluate< <i>i</i>-th point from the product of the <i>n</i>-point Gaussian (with parameter <i>sigma</i>) and Bartlett (raised to <i>triangle-exponent</i>) windows.</p>
+ </div>
+</div>
+
+
+<!--  ----------------------------------------------------------------- -->
+<h2><a name="Multiprocessing"></a>Multiprocessing Notes</h2>
+
+<p>Coefficients and temporary buffers are saved and reused between calls to <a href="#fft"><tt>fft</tt></a> and <a href="#ifft"><tt>ifft</tt></a>. These are contained in <tt>fft-instance</tt> and <tt>ifft-instance</tt> objects, which are stored in the variables <tt>*fft-instance*</tt> and <tt>*ifft-instance*</tt>, respectively. In a multiprocessing environment, simultaneous use of the same <tt>fft-instance</tt> or <tt>ifft-instance</tt> object will produce corrupted results. For this reason, a program performing simultaneous FFT/IFFT operations in multiple threads should ensure that each thread establishes its own dynamic binding of the <tt>*fft-instance*</tt> and <tt>*ifft-instance*</tt> variables, containing unique instances. It is sufficient to bind these to <tt>nil</tt> initially.</p>
+
+<!--  ----------------------------------------------------------------- -->
+
+<h2><a name="Changelog"></a>Revision History</h2>
+
+<ul>
+  <li>Version 2: Fixes infinite recursion when a non-power of two window size is passed to <a href="#windowed-fft"><tt>windowed-fft</tt></a></li>
+  <li>Version 1: Initial public release.</li>    
+</ul>
+
+<!--  ----------------------------------------------------------------- -->
+
+<h2><a name="Contact"></a>Contact</h2>
+Report bugs to Andy Hefner &lt;ahefner at gmail dot com&gt;
+
+<!--  ----------------------------------------------------------------- -->
+</body>
+</html>
