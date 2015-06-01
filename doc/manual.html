@@ -44,7 +44,7 @@
 <p>Bordeaux-FFT can be loaded either by compiling and loading the <tt>fft.lisp</tt> file directly, or using ASDF. An ASDF system definition file is included. Under typical ASDF configurations, a symbolic link to the file <tt>bordeaux-fft.asd</tt> should be created in a path included in your <tt>ASDF:*CENTRAL-REGISTRY*</tt>. For SBCL users, <tt>~/.sbcl/systems/</tt> is a common choice. You will then be able to load the <tt>BORDEAUX-FFT</tt> system using ASDF as follows: <tt> (asdf:oos 'asdf:load-op :bordeaux-fft)</tt>
 </p>
 
-<p>The most current version of Bordeaux-FFT may be obtained from <a href="http://vintage-digital.com/hefner/software/bordeaux-fft/bordeaux-fft-current.tar.gz">http://vintage-digital.com/hefner/software/bordeaux-fft/bordeaux-fft-current.tar.gz</a>.
+<p>The most current version of Bordeaux-FFT may be obtained from GitHub at <a href="https://github.com/ahefner/bordeaux-fft">https://github.com/ahefner/bordeaux-fft</a>.</p>
 
 <!--  ----------------------------------------------------------------- -->
 <h2><a name="Funcs"></a>FFT / IFFT Functions</h2>
@@ -211,8 +211,8 @@
 <h2><a name="Changelog"></a>Revision History</h2>
 
 <ul>
-  <li>Version 2: Fixes infinite recursion when a non-power of two window size is passed to <a href="#windowed-fft"><tt>windowed-fft</tt></a></li>
-  <li>Version 1: Initial public release.</li>    
+  <li>Version 1.0.1: Fixes infinite recursion when a non-power of two window size is passed to <a href="#windowed-fft"><tt>windowed-fft</tt></a></li>
+  <li>Version 1.0.0: Initial public release.</li>
 </ul>
 
 <!--  ----------------------------------------------------------------- -->
