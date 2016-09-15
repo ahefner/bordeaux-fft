@@ -126,6 +126,15 @@
  </div>
 </div>
 
+<div class="def"><a name="windowed-fft!">Function</a>
+                       <b>windowed-fft!</b>
+ <i>signal-vector window-dest dest center length <tt>&amp;optional</tt> (window-fn 'hann)</i> &rArr; <i>result</i>
+ <div class="docbody">
+     <p>Destructive version of <a href="#windowed-fft"><tt>windowed-fft</tt></a>.  Computes the specified window values from <i>signal-vector</i> into <i>window-dest</i>, and then computes the FFT into <i>dest</i>.</p>
+ </div>
+</div>
+
+
 <div class="def"><a name="window-vector">Function</a>
                        <b>window-vector</b> 
  <i>function length</i> &rArr; <i>vector</i>
