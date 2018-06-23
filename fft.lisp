@@ -215,8 +215,8 @@
   (ifft-common *ifft-instance* source dest))
 
 (defun sifft (source)
-  "This is the generic fft function. Stands for stupid fft. Can take
-   any kind of array as input."
+  "This is the generic inverse fft function. Stands for stupid inverse fft.
+   Can take any kind of array as input."
   (let* ((l (length source))
 	 (lp (expt 2 (power-of-two l)))
 	 (new-source (if (typep source 'complex-sample-array)
